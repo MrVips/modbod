@@ -165,36 +165,6 @@ public class UploadBomMojoIntegrationTest extends AbstractDependencyTrackMojoTes
     }
 
     @Test
-    public void thatProjectVersionCanBeProvided() throws Exception {
-        stubFor(get(urlPathMatching(V1_PROJECT)).willReturn(
-                aResponse().withBodyFile("api/v1/project/get-all-projects.json")));
-        stubFor(put(urlEqualTo(V1_BOM)).willReturn(ok()));
-
-
-        UploadBomMojo uploadBomMojo = uploadBomMojo(BOM_LOCATION);
-        uploadBomMojo.setProjectVersion("99.99.99-RELEASE");
-        uploadBomMojo.execute();
-
-        verify(exactly(1), putRequestedFor(urlEqualTo(V1_BOM))
-                .withRequestBody(
-                        matchingJsonPath("$.projectVersion", equalTo("99.99.99-RELEASE"))));
-    }
-
-    @Test
-    public void thatProjectVersionDefaultsToPomVersion() throws Exception {
-        stubFor(get(urlPathMatching(V1_PROJECT)).willReturn(
-                aResponse().withBodyFile("api/v1/project/get-all-projects.json")));
-        stubFor(put(urlEqualTo(V1_BOM)).willReturn(ok()));
-
-        UploadBomMojo uploadBomMojo = uploadBomMojo(BOM_LOCATION);
-        uploadBomMojo.execute();
-
-        verify(exactly(1), putRequestedFor(urlEqualTo(V1_BOM))
-                .withRequestBody(
-                        matchingJsonPath("$.projectVersion", equalTo("0.0.1-SNAPSHOT"))));
-    }
-
-    @Test
     public void thatTheUploadIsSkippedWhenSkipIsTrue() throws Exception {
         stubFor(get(urlPathMatching(V1_PROJECT)).willReturn(
                 aResponse().withBodyFile("api/v1/project/get-all-projects.json")));

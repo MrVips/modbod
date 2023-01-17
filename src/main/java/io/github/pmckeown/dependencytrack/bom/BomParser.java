@@ -63,6 +63,7 @@ public class BomParser {
         info.setGroup(component.getGroup());
         info.setPurl(component.getPurl());
         info.setCpe(component.getCpe());
+        info.setVersion(component.getVersion());
         if (component.getSwid() != null) {
             info.setSwidTagId(component.getSwid().getTagId());
         }

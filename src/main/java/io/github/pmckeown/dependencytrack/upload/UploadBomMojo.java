@@ -61,9 +61,6 @@ public class UploadBomMojo extends AbstractDependencyTrackMojo {
     @Override
     public void performAction() throws MojoExecutionException, MojoFailureException {
         try {
-            if (!uploadBomAction.upload(getBomLocation())) {
-                handleFailure("Bom upload failed");
-            }
             Project project = projectAction.getProject(projectName, projectVersion);
             if (updateProjectInfo) {
                 logger.info("Updating project info");
@@ -71,6 +68,15 @@ public class UploadBomMojo extends AbstractDependencyTrackMojo {
                     logger.info("Failed to update project info");
                 }
             }
+            metricsAction.refreshMetrics(project);
+        } catch (DependencyTrackException ex) {
+            logger.info("Try to upload new project");
+        }
+        try {
+            if (!uploadBomAction.upload(getBomLocation())) {
+                handleFailure("Bom upload failed");
+            }
+            Project project = projectAction.getProject(projectName, projectVersion);
             metricsAction.refreshMetrics(project);
         } catch (DependencyTrackException ex) {
             handleFailure("Error occurred during upload", ex);

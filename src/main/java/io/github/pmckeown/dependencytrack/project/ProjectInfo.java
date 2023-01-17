@@ -17,6 +17,7 @@ public class ProjectInfo {
     private String purl;
     private String cpe;
     private String swidTagId;
+    private String version;
 
     public String getAuthor() {
         return author;
@@ -81,6 +82,15 @@ public class ProjectInfo {
     public void setSwidTagId(String swidTagId) {
         this.swidTagId = swidTagId;
     }
+
+    public String getVersion(){
+        return version;
+    } 
+
+    public void setVersion(String version){
+        this.version = version;
+    }
+
 
     @Override
     public String toString() {

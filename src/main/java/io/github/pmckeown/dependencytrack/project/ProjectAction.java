@@ -87,7 +87,7 @@ public class ProjectAction {
 
     private Optional<Project> findProject(List<Project> projects, String projectName, String projectVersion) {
         return projects.stream()
-                .filter(project -> projectName.equals(project.getName()) && projectVersion.equals(project.getVersion()))
+                .filter(project -> projectName.equals(project.getName()) && Long.parseLong(projectVersion.replaceAll("[^0-9]", "")) >= Long.parseLong(project.getVersion().replaceAll("[^0-9]", "")))
                 .findFirst();
     }
 }
