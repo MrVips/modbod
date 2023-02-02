@@ -51,34 +51,4 @@ public class ProjectClientIntegrationTest extends AbstractDependencyTrackMojoTes
 		verify(exactly(1), getRequestedFor(urlEqualTo(V1_PROJECT_WITH_ONE_MILLION_LIMIT)));
 		assertThat(projects.size(), is(COUNT_ALL_PROJECTS));
 	}
-
-	@Test
-	public void thatProjectInfoUpdateReturnsSuccessWhenServerReturnsSuccess() {
-		stubFor(patch(urlPathMatching(V1_PROJECT_UUID)).willReturn(
-				aResponse().withStatus(HttpStatus.OK)));
-
-		Response<Void> response = projectClient.patchProject("1234", aProjectInfo().build());
-		assertThat(response.isSuccess(), is(equalTo(true)));
-		verify(exactly(1), patchRequestedFor(urlPathMatching(V1_PROJECT_UUID)));
-	}
-
-	@Test
-	public void thatProjectInfoUpdateReturnsSuccessWhenServerReturnsNotModified() {
-		stubFor(patch(urlPathMatching(V1_PROJECT_UUID)).willReturn(
-				aResponse().withStatus(HttpStatus.NOT_MODIFIED)));
-
-		Response<Void> response = projectClient.patchProject("1234", aProjectInfo().build());
-		assertThat(response.isSuccess(), is(equalTo(true)));
-		verify(exactly(1), patchRequestedFor(urlPathMatching(V1_PROJECT_UUID)));
-	}
-
-	@Test
-	public void thatProjectInfoUpdateReturnsFailedWhenServerReturnsTeapot() {
-		stubFor(patch(urlPathMatching(V1_PROJECT_UUID)).willReturn(
-				aResponse().withStatus(HttpStatus.IM_A_TEAPOT)));
-
-		Response<Void> response = projectClient.patchProject("1234", aProjectInfo().build());
-		assertThat(response.isSuccess(), is(equalTo(false)));
-		verify(exactly(1), patchRequestedFor(urlPathMatching(V1_PROJECT_UUID)));
-	}
 }

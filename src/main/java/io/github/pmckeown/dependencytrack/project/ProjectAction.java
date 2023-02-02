@@ -60,7 +60,8 @@ public class ProjectAction {
         Optional<ProjectInfo> info = bomParser.getProjectInfo(new File(bomLocation));
         if (info.isPresent()) {
             try {
-                Response<Void> response = projectClient.patchProject(project.getUuid(), info.get());
+                Response<Void> response = projectClient.patchProject(project, info.get());
+                logger.info("response" + response.toString());
                 return response.isSuccess();
             } catch (UnirestException ex) {
                 logger.error("Failed to update project info", ex);

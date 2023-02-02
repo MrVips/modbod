@@ -82,7 +82,6 @@ public class ProjectInfo {
     public void setSwidTagId(String swidTagId) {
         this.swidTagId = swidTagId;
     }
-
     public String getVersion(){
         return version;
     } 

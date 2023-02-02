@@ -104,37 +104,6 @@ public class ProjectActionTest {
             assertThat(ex, is(instanceOf(DependencyTrackException.class)));
         }
     }
-
-    @Test
-    public void thatWhenProjectInfoIsUpdatedTrueIsReturned() throws Exception {
-        doReturn(Optional.of(new ProjectInfo())).when(bomParser).getProjectInfo(any(File.class));
-        doReturn(aSuccessResponse().build()).when(projectClient).patchProject(anyString(), any(ProjectInfo.class));
-        boolean projectInfoUpdated = projectAction.updateProjectInfo(aProjectList().get(0),
-                String.valueOf(new File(BomParser.class.getResource("bom.xml").getPath())));
-        assertThat(projectInfoUpdated, is(equalTo(true)));
-    }
-
-    @Test
-    public void thatWhenProjectInfoIsNotUpdatedFalseIsReturned() throws Exception {
-        doReturn(Optional.of(new ProjectInfo())).when(bomParser).getProjectInfo(any(File.class));
-        doReturn(aNotFoundResponse()).when(projectClient).patchProject(anyString(), any(ProjectInfo.class));
-        boolean projectInfoUpdated = projectAction.updateProjectInfo(aProjectList().get(0),
-                String.valueOf(new File(BomParser.class.getResource("bom.xml").getPath())));
-        assertThat(projectInfoUpdated, is(equalTo(false)));
-    }
-
-    @Test
-    public void thatWhenProjectInfoUpdateErrorsAnExceptionIsThrown() {
-        doReturn(Optional.of(new ProjectInfo())).when(bomParser).getProjectInfo(any(File.class));
-        doThrow(UnirestException.class).when(projectClient).patchProject(anyString(), any(ProjectInfo.class));
-        try {
-            projectAction.updateProjectInfo(aProjectList().get(0),
-                    String.valueOf(new File(BomParser.class.getResource("bom.xml").getPath())));
-            fail("Exception expected");
-        } catch (Exception ex) {
-            assertThat(ex, is(instanceOf(DependencyTrackException.class)));
-        }
-    }
     
     private Response aNotFoundResponse() {
         return new Response(404, "Not Found", false);

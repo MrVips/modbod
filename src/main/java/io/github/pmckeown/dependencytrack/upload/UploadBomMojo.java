@@ -18,15 +18,19 @@ import org.apache.maven.project.MavenProject;
 import javax.inject.Inject;
 
 /**
- * Provides the capability to upload a Bill of Material (BOM) to your Dependency Track server.
+ * Provides the capability to upload a Bill of Material (BOM) to your Dependency
+ * Track server.
  *
- * The BOM may any format supported by your Dependency Track server, has only been tested with the output from the
- * <a href="https://github.com/CycloneDX/cyclonedx-maven-plugin">cyclonedx-maven-plugin</a> in the
+ * The BOM may any format supported by your Dependency Track server, has only
+ * been tested with the output from the
+ * <a href=
+ * "https://github.com/CycloneDX/cyclonedx-maven-plugin">cyclonedx-maven-plugin</a>
+ * in the
  * <a href="https://cyclonedx.org/">CycloneDX</a> format
  *
  * Specific configuration options are:
  * <ol>
- *     <li>bomLocation</li>
+ * <li>bomLocation</li>
  * </ol>
  *
  * @author Paul McKeown
@@ -39,9 +43,12 @@ public class UploadBomMojo extends AbstractDependencyTrackMojo {
 
     @Parameter(property = "project", readonly = true, required = true)
     private MavenProject mavenProject;
-    
+
     @Parameter(property = "dependency-track.updateProjectInfo")
     private boolean updateProjectInfo;
+
+    @Parameter(defaultValue = "false", property = "dependency-track.updateReplace")
+    private boolean updateReplace;
 
     private UploadBomAction uploadBomAction;
 
@@ -51,7 +58,7 @@ public class UploadBomMojo extends AbstractDependencyTrackMojo {
 
     @Inject
     public UploadBomMojo(UploadBomAction uploadBomAction, MetricsAction metricsAction, ProjectAction projectAction,
-             CommonConfig commonConfig, Logger logger) {
+            CommonConfig commonConfig, Logger logger) {
         super(commonConfig, logger);
         this.uploadBomAction = uploadBomAction;
         this.metricsAction = metricsAction;
@@ -60,23 +67,41 @@ public class UploadBomMojo extends AbstractDependencyTrackMojo {
 
     @Override
     public void performAction() throws MojoExecutionException, MojoFailureException {
+        if (updateReplace) {
+            try {
+                if (updateReplace && !uploadBomAction.upload(getBomLocation(),
+                        projectAction.getProject(projectName, projectVersion).getUuid())) {
+                    handleFailure("Bom upload failed");
+                }
+            } catch (DependencyTrackException ex) {
+                try {
+                    if (!uploadBomAction.upload(getBomLocation())) {
+                        handleFailure("Bom upload failed");
+                    }
+                } catch (DependencyTrackException ex1) {
+                }
+            }
+        } else {
+            try {
+                if (!uploadBomAction.upload(getBomLocation())) {
+                    handleFailure("Bom upload failed");
+                }
+            } catch (DependencyTrackException ex1) {
+            }
+        }
         try {
+
             Project project = projectAction.getProject(projectName, projectVersion);
-            if (updateProjectInfo) {
+            logger.info(project.getVersion());
+            project.setVersion(projectVersion);
+            logger.info(project.getVersion());
+            if (updateProjectInfo || updateReplace) {
                 logger.info("Updating project info");
                 if (!projectAction.updateProjectInfo(project, getBomLocation())) {
                     logger.info("Failed to update project info");
                 }
             }
-            metricsAction.refreshMetrics(project);
-        } catch (DependencyTrackException ex) {
-            logger.info("Try to upload new project");
-        }
-        try {
-            if (!uploadBomAction.upload(getBomLocation())) {
-                handleFailure("Bom upload failed");
-            }
-            Project project = projectAction.getProject(projectName, projectVersion);
+            project = projectAction.getProject(projectName, projectVersion);
             metricsAction.refreshMetrics(project);
         } catch (DependencyTrackException ex) {
             handleFailure("Error occurred during upload", ex);

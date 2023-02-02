@@ -58,9 +58,10 @@ public class ProjectClient {
         return new Response<>(httpResponse.getStatus(), httpResponse.getStatusText(), httpResponse.isSuccess());
     }
 
-    public Response<Void> patchProject(String uuid, ProjectInfo info) {
+    public Response<Void> patchProject(Project project, ProjectInfo info) {
+        info.setVersion(project.getVersion());
         HttpResponse<?> httpResponse = patch(commonConfig.getDependencyTrackBaseUrl() + V1_PROJECT_UUID)
-                .routeParam("uuid", uuid)
+                .routeParam("uuid", project.getUuid())
                 .header(X_API_KEY, commonConfig.getApiKey())
                 .contentType("application/json")
                 .body(info)

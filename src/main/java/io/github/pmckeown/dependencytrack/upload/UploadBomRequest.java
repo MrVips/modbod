@@ -14,11 +14,17 @@ public class UploadBomRequest {
     private String projectVersion;
     private boolean autoCreate;
     private String base64EncodedBom;
+    private String project;
 
     UploadBomRequest(String projectName, String projectVersion, boolean autoCreate, String base64EncodedBom) {
         this.projectName = projectName;
         this.projectVersion = projectVersion;
         this.autoCreate = autoCreate;
+        this.base64EncodedBom = base64EncodedBom;
+    }
+
+    UploadBomRequest(String project, String base64EncodedBom) {
+        this.project = project;
         this.base64EncodedBom = base64EncodedBom;
     }
 
@@ -36,6 +42,10 @@ public class UploadBomRequest {
 
     public String getBom() {
         return base64EncodedBom;
+    }
+
+    public String getProject() {
+        return project;
     }
 
     public String toString() {

@@ -46,7 +46,6 @@ class BomClient {
                 .body(bom);
         HttpResponse<UploadBomResponse> httpResponse = requestBodyEntity.asObject(
                 new GenericType<UploadBomResponse>() {});
-
         Optional<UploadBomResponse> body;
         if (httpResponse.isSuccess()) {
             body = Optional.of(httpResponse.getBody());

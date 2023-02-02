@@ -34,7 +34,7 @@ public class UploadBomAction {
         this.logger = logger;
     }
 
-    public boolean upload(String bomLocation) throws DependencyTrackException {
+    public boolean upload(String bomLocation, String ... uuid) throws DependencyTrackException {
         logger.info("Project Name: %s", commonConfig.getProjectName());
         logger.info("Project Version: %s", commonConfig.getProjectVersion());
         logger.info("%s", commonConfig.getPollingConfig());
@@ -44,9 +44,12 @@ public class UploadBomAction {
             logger.error("No bom.xml could be located at: %s", bomLocation);
             return false;
         }
-
-        Optional<UploadBomResponse> uploadBomResponse = doUpload(encodedBomOptional.get());
-
+        Optional<UploadBomResponse> uploadBomResponse;
+        if(uuid.length > 0){
+            uploadBomResponse = doUpload(encodedBomOptional.get(), uuid[0]);
+        } else {
+            uploadBomResponse = doUpload(encodedBomOptional.get());
+        }
         if (commonConfig.getPollingConfig().isEnabled() && uploadBomResponse.isPresent()) {
             try {
                 pollUntilBomIsProcessed(uploadBomResponse.get());
@@ -74,11 +77,15 @@ public class UploadBomAction {
         });
     }
 
-    private Optional<UploadBomResponse> doUpload(String encodedBom) throws DependencyTrackException {
+    private Optional<UploadBomResponse> doUpload(String encodedBom, String ... uuid) throws DependencyTrackException {
         try {
-            Response<UploadBomResponse> response = bomClient.uploadBom(new UploadBomRequest(
-                    commonConfig.getProjectName(), commonConfig.getProjectVersion(), true, encodedBom));
-            
+            Response<UploadBomResponse> response;
+            if(uuid.length > 0){
+                response = bomClient.uploadBom(new UploadBomRequest(uuid[0] , encodedBom));
+            } else {
+                response = bomClient.uploadBom(new UploadBomRequest(
+                    commonConfig.getProjectName(), commonConfig.getProjectVersion(), true , encodedBom));
+            }
             if (response.isSuccess()) {
                 logger.info("BOM uploaded to Dependency Track server");
                 return response.getBody();
